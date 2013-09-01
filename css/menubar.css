@@ -1,0 +1,121 @@
+#menubar 
+{ 
+  height: 40px;
+  position:fixed;
+  display:inline-block;
+  top:0px;
+  left:0px;
+  width:100%;
+  margin: 0px;
+  border: 0px;
+  padding: 0px;
+}
+
+#menubar > img 
+{ 
+  float:left;
+  height: 40px; 
+  border: none;
+}
+
+#menubar > div
+{
+  border:none;
+  background:inherit;
+  position:relative;
+  margin-left:20px;
+  top:10px;
+}
+
+#menubar > div > span
+{
+  font-family: verdana, geneva, tahoma, sans-serif;
+  font-size: 12px;
+  background:inherit;
+  color:white;
+  border:none;
+  margin-right:10px;
+}
+
+#login-dialog input:-webkit-autofill
+{
+  background-color: white;
+}
+
+#login-error-msg 
+{
+  display:none;
+}
+
+.menubar-text
+{
+  cursor:default;
+}
+
+#menubar-left
+{
+  float:left;
+}
+
+#menubar-right
+{
+  float:right;
+}
+
+#username
+{
+  font-weight:bold;
+}
+
+#menubar #login,
+#menubar #username
+{
+  padding-left: 10px;
+  padding-right: 10px;
+  border-left: thin dotted;
+}
+
+#menubar #login:hover
+{
+  color:yellow;
+  cursor:pointer;
+}
+
+#menubar #pagetitle
+{
+  font-weight:bold;
+  font-size:18px;
+}
+
+.login-dialog
+{
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+.login-dialog .ui-dialog-titlebar
+{
+  display:none;
+}
+
+.login-dialog .ui-dialog-content
+{
+  font-size:12px;
+}
+
+.login-dialog .ui-dialog .ui-dialog-buttonpane
+{
+  padding: 0px 0px 0px 0px;
+}
+
+.login-dialog .ui-dialog-buttonpane .ui-button-text
+{
+  font-size:12px;
+}
+
+.login-dialog form
+{
+  margin-bottom: 0em;
+}
+
+
