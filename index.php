@@ -11,7 +11,8 @@ include('php/core_funcs.php');
     $action = $_REQUEST['action'];
     switch($action)
     {
-    case 'verify_login': verify_login(); break;
+    case 'verify_login': verify_login();  break;
+    case 'logout':       handle_logout(); break;
     default:
       echo "default action for $action\n";
       break;
@@ -19,6 +20,7 @@ include('php/core_funcs.php');
   }
   else
   {
+    show_session_variables();
     load_view('home');
   }
 ?>

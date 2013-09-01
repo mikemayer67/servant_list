@@ -1,17 +1,17 @@
 <html>
 
 <head>
-  <script src="js/jquery.js"></script>
-	<script src="js/jquery-ui.js"></script>
+  <script src="js/jquery-1.10.2.js"></script>
+	<script src="js/jquery-ui-1.10.3.cts_sl.js"></script>
 
   <title>CTS Servant List</title>
-  <link rel=stylesheet href="style/servantlist/jquery-ui-1.10.3.custom.min.css" />
-  <link rel=stylesheet href="style/servantlist.css" />
+  <link rel=stylesheet href="css/jquery-ui-1.10.3.cts_sl.css" />
+  <link rel=stylesheet href="css/servantlist.css" />
 </head>
 
 <body>
 <?php 
-  load_view('banner');
+  load_view('menubar');
 ?>
 
 <pre>
@@ -53,7 +53,7 @@ css/                    index.php               js/
 beachbum.home:mike:292> dc
 ./index.php~
 ./php/header.php~
-./php/banner.php~
+./php/menubar.php~
 beachbum.home:mike:293> ls
 LICENSE                 development-bundle/     jquery_ui_demo.html*
 README.md               graphics/               js/
@@ -103,7 +103,7 @@ css/                    index.php               js/
 beachbum.home:mike:292> dc
 ./index.php~
 ./php/header.php~
-./php/banner.php~
+./php/menubar.php~
 beachbum.home:mike:293> ls
 LICENSE                 development-bundle/     jquery_ui_demo.html*
 README.md               graphics/               js/

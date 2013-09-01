@@ -3,40 +3,47 @@ session_start();
 
 include('php/database.php');
 
-function session_views()
+function is_logged_in()
 {
-  if(isset($_SESSION['views']))
-  {
-    $_SESSION['views'] += 1;
-  }
-  else
-  {
-    $_SESSION['views'] = 1;
-  }
-  return $_SESSION['views'];
+  return isset($_SESSION['userid']);
 }
 
 function session_userid()
 {
-  return (isset($_SESSION['userid']) ? $_SESSION['userid'] : -1);
+  return (is_logged_in() ? $_SESSION['userid'] : "");
 }
 
 function session_username()
 {
-  $id = session_userid();
-  return ($id<0 ? 'Guest' : $_SESSION['username']);
+  return (is_logged_in() ? $_SESSION['username'] : "Guest");
 }
 
-function session_userrole()
+function handle_logout()
 {
-  $id = session_userid();
-  return "(role $id)";
+  error_log("handle_logout");
+  session_destroy();
+  session_start();
+}
+
+function show_session_variables()
+{
+  if(is_logged_in())
+  {
+    $_SESSION['count'] = (isset($_SESSION['count']) ? 1+$_SESSION['count'] : 1);
+    $n = $_SESSION['count'];
+    $x = 'Yes';
+  } else
+  {
+    $n = 0;
+    $x = 'No';
+  }
+  echo "<h2>Session_count: $n  Logged in: $x</h2>\n";
 }
 
 function verify_login()
 {
-  $userid   = isset($_REQUEST['userid'])   ? $_REQUEST['userid']   : "";
-  $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
+  $userid = isset($_REQUEST['userid'])   ? $_REQUEST['userid']   : "";
+  $passwd = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
   preg_replace('/\s+/','',$userid);
 
   try
@@ -54,63 +61,79 @@ function verify_login()
       throw new Exception($err,2);
     }
 
-    $res = $db->query("select id,username,password,admin from users where userid='$userid'");
+    $res = $db->query("select userid,password,name,admin from people where userid='$userid'");
 
     $n = $res->num_rows;
     if($n==0)
     {
-      error_log("Invalid user: $userid");
+      error_log("Unknown userid: $userid");
       throw new Exception("Invalid login",3);
     }
 
     $userdata = $res->fetch_assoc();  // should only be one match!
+    $res->close();
 
-    if(strlen($password)==0)
+    if(strlen($passwd)==0)
     {
       error_log("Empty password for '$userid'");
       throw new Exception("Invalid login",4);
     }
 
-    $password    = urlencode($password);
-    $user_passwd = $userdata["password"];
+    $passwd    = urlencode($passwd);
+    $db_passwd = $userdata['password'];
+    $name      = $userdata['name'];
+    $admin     = intval($userdata['admin']);
 
-    if( strlen($user_passwd)==0 )
+    if( strlen($db_passwd)==0 )
     {
       $chars='./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; 
       $salt='$2y$07$'; 
       for($i=0;$i<21;$i++) $salt.=$chars[rand(0,63)]; 
-      $user_passwd = crypt($password,$salt);
-      $db->query("update users set password='$user_passwd' where userid='$userid'");
+      $db_passwd = crypt($passwd,$salt);
+      $db->query("update people set password='$db_passwd' where userid='$userid'");
       error_log("Set password for user $userid");
     }
     else
     {
-      $salt = substr($user_passwd,0,28);
-      $password = crypt($password,$salt);
-      if( strcmp($password,$user_passwd) )
+      $salt = substr($db_passwd,0,28);
+      $passwd = crypt($passwd,$salt);
+      if( strcmp($passwd,$db_passwd) )
       {
         error_log("Invalid password entered for '$userid'");
         throw new Exception("Invalid login",5);
       }
     }
 
+    $roles = array();
+    $res = $db->query("select a.list,a.description from lists a,coordinators b where a.list=b.list and b.userid='$userid'");
+    if($res)
+    {
+      while($row = $res->fetch_row())
+      {
+        $roles[$row[0]] = $row[1];
+      }
+      $res->close();
+    }
+
     $_SESSION['userid']   = $userid;
-    $_SESSION['username'] = $userdata['username'];
-    $_SESSION['admin']    = $userdata['admin'];
-    $_SESSION['id']       = $userdata['id'];
+    $_SESSION['username'] = $name;
+    $_SESSION['admin']    = $admin;
+    $_SESSION['roles']    = $roles;
 
     $rval = array( "state"=>0, 
                    "userid"=>$userid, 
-                   "username"=>$userdata["username"], 
-                   "id"=>$userdata["id"], 
-                   "admin"=>$userdata["admin"] );
+                   "username"=>$name,
+                   "admin"=>$admin,
+                   "roles"=>$roles );
   }
   catch(Exception $e)
   {
     $rval = array( "state"=>$e->getCode(), "error"=>$e->getMessage() );
   }
 
-  print json_encode($rval);
+  $rval = json_encode($rval);
+  print $rval;
+  error_log($rval);
   return;
 }
 ?>
