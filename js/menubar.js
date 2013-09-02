@@ -1,3 +1,5 @@
+var isLogin;
+
 $( "#login-dialog" ).dialog( 
                             { autoOpen:    false, 
                               width:       175,
@@ -5,25 +7,28 @@ $( "#login-dialog" ).dialog(
                               position:    { my: "right top", at: "right bottom", of: $("#menubar") }, 
                               open:        handle_dialog_open,
                               close:       handle_dialog_close,
-                              show:        {effect: "slide", direction: "up", delay: 250},
-                              hide:        {effect: "slide", direction: "up", delay: 100},
+                              show:        {effect: "slide", direction: "up", delay: 50},
+                              hide:        {effect: "slide", direction: "up", delay: 50},
                               buttons: [ 
                                 { text: "OK",     id:'login-dialog-ok',     click: handle_login_ok     },
-                                { text: "Cancel", id:'login-dialog-cancel', click: clear_and_close_login }
                               ]
 } );
 
 function setup_for_login() {
+  isLogin = 1;
   $( "#username" ).text("Guest");
-  $( "#login" ).text("Login");
+  $( "#loginText" ).text("Login");
   $( "#login" ).unbind('click');
-  $( "#login" ).click( function() { $( "#login-dialog" ).dialog( "open" ); } );
+  $( "#login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
+  $( "#loginArrow" ).addClass('downArrow');
 }
 
 function setup_for_logout() {
-  $( "#login" ).text("Logout");
+  isLogin = 0;
+  $( "#loginText" ).text("Logout");
   $( "#login" ).unbind('click');
   $( "#login" ).click( handle_logout );
+  $( "#loginArrow" ).removeClass('downArrow').removeClass('upArrow');
 }
 
 $( "#userid-input" ).bind('input',watch_login_input);
@@ -45,12 +50,25 @@ function handle_dialog_open()
   $(window).resize( function() {
     $("#login-dialog").dialog( "option","position", { my: "right top", at: "right bottom", of: $("#menubar") } );
   } );
+  $(window).mouseup(function(x) { 
+    if($(x.target).parents('.login-dialog').length<1) { $('#login-dialog').dialog('close'); }
+  } );
   $("#login-error-msg").hide();
+  $("#loginArrow").removeClass('downArrow').addClass('upArrow');
+  $("#login").unbind("click");
 }
 
 function handle_dialog_close()
 {
   $(window).unbind('resize');
+  $(window).unbind('mouseup');
+  if(isLogin) {
+    $("#loginArrow").removeClass('upArrow').addClass('downArrow');
+  } else {
+    $("#loginArrow").removeClass('upArrow').removeClass('downArrow');
+  }
+
+  $( "#login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
 }
 
 function handle_login_ok()

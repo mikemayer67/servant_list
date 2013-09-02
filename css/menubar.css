@@ -103,7 +103,7 @@
   font-size:12px;
 }
 
-.login-dialog .ui-dialog .ui-dialog-buttonpane
+.login-dialog .ui-dialog-buttonpane
 {
   padding: 0px 0px 0px 0px;
 }
@@ -118,4 +118,30 @@
   margin-bottom: 0em;
 }
 
+#loginArrow
+{
+  height:15px;
+  width:15px;
+  display:inline-block;
+  margin-left:5px;
+}
 
+#loginArrow.downArrow
+{
+  background:url(../graphics/downArrow.png);
+}
+
+#loginArrow.upArrow
+{
+  background:url(../graphics/upArrow.png);
+}
+
+#loginArrow.downArrow:hover
+{
+  background:url(../graphics/downArrowHover.png);
+}
+
+#loginArrow.upArrow:hover
+{
+  background:url(../graphics/upArrowHover.png);
+}

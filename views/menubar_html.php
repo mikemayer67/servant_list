@@ -9,7 +9,7 @@
     <span id=currentrole class=menubar-text>(role text)</span>
     <span id=username class=menubar-text>
     <?php echo session_username(); ?></span>
-    <span id=login class=menubarbutton>(login text)</span>
+    <span id=login class=menubarbutton><span id=loginText>(login text)</span><span id=loginArrow class='downArrow'></span></span>
   </div>
 </div>
 
