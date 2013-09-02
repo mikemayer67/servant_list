@@ -1,4 +1,4 @@
-var isLogin;
+var userIsLoggedIn=0;
 
 $( "#login-dialog" ).dialog( 
                             { autoOpen:    false, 
@@ -13,23 +13,6 @@ $( "#login-dialog" ).dialog(
                                 { text: "OK",     id:'login-dialog-ok',     click: handle_login_ok     },
                               ]
 } );
-
-function setup_for_login() {
-  isLogin = 1;
-  $( "#username" ).text("Guest");
-  $( "#loginText" ).text("Login");
-  $( "#login" ).unbind('click');
-  $( "#login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
-  $( "#loginArrow" ).addClass('downArrow');
-}
-
-function setup_for_logout() {
-  isLogin = 0;
-  $( "#loginText" ).text("Logout");
-  $( "#login" ).unbind('click');
-  $( "#login" ).click( handle_logout );
-  $( "#loginArrow" ).removeClass('downArrow').removeClass('upArrow');
-}
 
 $( "#userid-input" ).bind('input',watch_login_input);
 $( "#passwd-input" ).bind('input',watch_login_input);
@@ -54,21 +37,21 @@ function handle_dialog_open()
     if($(x.target).parents('.login-dialog').length<1) { $('#login-dialog').dialog('close'); }
   } );
   $("#login-error-msg").hide();
-  $("#loginArrow").removeClass('downArrow').addClass('upArrow');
-  $("#login").unbind("click");
+  $("#loginArrow").removeClass('mb-down-arrow').addClass('mb-up-arrow');
+  $("#mb-login").unbind("click");
 }
 
 function handle_dialog_close()
 {
   $(window).unbind('resize');
   $(window).unbind('mouseup');
-  if(isLogin) {
-    $("#loginArrow").removeClass('upArrow').addClass('downArrow');
+  if(userIsLoggedIn) {
+    $("#loginArrow").removeClass('mb-up-arrow').removeClass('mb-down-arrow');
   } else {
-    $("#loginArrow").removeClass('upArrow').removeClass('downArrow');
+    $("#loginArrow").removeClass('mb-up-arrow').addClass('mb-down-arrow');
   }
 
-  $( "#login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
+  $( "#mb-login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
 }
 
 function handle_login_ok()
@@ -99,8 +82,8 @@ function handle_verify_result(x)
     $("#login-error-msg").hide();
     alert("Result Returned\n"+x.userid+"\n"+x.username);
     clear_and_close_login();
-    $("#username").text(x.username);
-    setup_for_logout();
+    $("#mb-username").text(x.username);
+    handle_login(x.username);
   } else { // invalid userid
     $("#login-error-msg").text(x.error).show();
     clear_password();
@@ -139,7 +122,17 @@ function watch_login_input()
   $( "#login-error-msg" ).hide();
 }
 
-function handle_logout()
+
+function handle_login(username) {
+  userIsLoggedIn=1;
+  $( "#mb-username").text(username);
+  $( "#loginText" ).text("Logout");
+  $( "#mb-login" ).unbind('click');
+  $( "#mb-login" ).click( handle_logout );
+  $( "#loginArrow" ).removeClass('mb-down-arrow').removeClass('mb-up-arrow');
+}
+
+function handle_logout(username)
 {
   $.ajax('index.php',
          { cache: false,
@@ -148,5 +141,10 @@ function handle_logout()
            type: "POST"
          });
 
-  setup_for_login();
+  userIsLoggedIn=0;
+  $( "#mb-username" ).text("Guest");
+  $( "#loginText" ).text("Login");
+  $( "#mb-login" ).unbind('click');
+  $( "#mb-login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
+  $( "#loginArrow" ).addClass('mb-down-arrow');
 }

@@ -62,20 +62,20 @@
   float:right;
 }
 
-#username
+#mb-username
 {
   font-weight:bold;
 }
 
-#menubar #login,
-#menubar #username
+#menubar #mb-login,
+#menubar #mb-username
 {
   padding-left: 10px;
   padding-right: 10px;
   border-left: thin dotted;
 }
 
-#menubar #login:hover
+#menubar #mb-login:hover
 {
   color:yellow;
   cursor:pointer;
@@ -118,7 +118,7 @@
   margin-bottom: 0em;
 }
 
-#loginArrow
+.mb-arrow-icon
 {
   height:15px;
   width:15px;
@@ -126,22 +126,22 @@
   margin-left:5px;
 }
 
-#loginArrow.downArrow
+.mb-down-arrow
 {
   background:url(../graphics/downArrow.png);
 }
 
-#loginArrow.upArrow
+.mb-up-arrow
 {
   background:url(../graphics/upArrow.png);
 }
 
-#loginArrow.downArrow:hover
+.mb-down-arrow:hover
 {
   background:url(../graphics/downArrowHover.png);
 }
 
-#loginArrow.upArrow:hover
+.mb-up-arrow:hover
 {
   background:url(../graphics/upArrowHover.png);
 }

@@ -6,10 +6,9 @@
     <span id=pagetitle class=menubar-text>CTS Servant List</span>
   </div>
   <div id=menubar-right>
-    <span id=currentrole class=menubar-text>(role text)</span>
-    <span id=username class=menubar-text>
-    <?php echo session_username(); ?></span>
-    <span id=login class=menubarbutton><span id=loginText>(login text)</span><span id=loginArrow class='downArrow'></span></span>
+    <span id=mb-role class=menubar-text>(role text)</span>
+    <span id=mb-username class=menubar-text>(username)</span>
+    <span id=mb-login class=menubarbutton><span id=loginText>(login text)</span><span id=loginArrow class='mb-arrow-icon'></span></span>
   </div>
 </div>
 
@@ -27,5 +26,5 @@
 </div>
  
 <script src="js/menubar.js"></script>
-<script><?php $x=(is_logged_in() ? 'logout' : 'login'); echo "setup_for_$x();" ?></script>
+<script><?php $x=(is_logged_in() ? 'login' : 'logout'); $name=session_username(); echo "handle_$x('$name');" ?></script>
 
