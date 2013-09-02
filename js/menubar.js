@@ -1,34 +1,61 @@
 var userIsLoggedIn=0;
 
+//
+// login actions
+//
+
+function handle_login(username) {
+  alert('handle_login');
+  userIsLoggedIn=1;
+  $( "#mb-username").text(username);
+  $( "#loginText" ).text("Logout");
+  $( "#mb-login" ).unbind('click');
+  $( "#mb-login" ).click( handle_logout );
+  $( "#loginArrow" ).removeClass('mb-down-arrow').removeClass('mb-up-arrow');
+}
+
+function handle_logout(username)
+{
+  alert('handle_logout');
+  $.ajax('index.php',
+         { cache: false,
+           dataType: "json",
+           data: {action: "logout" },
+           type: "POST"
+         });
+
+  userIsLoggedIn=0;
+  $( "#mb-username" ).text("Guest");
+  $( "#loginText" ).text("Login");
+  $( "#mb-login" ).unbind('click');
+  $( "#mb-login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
+  $( "#loginArrow" ).addClass('mb-down-arrow');
+}
+//
+// login dialog box
+//
+
 $( "#login-dialog" ).dialog( 
                             { autoOpen:    false, 
                               width:       175,
                               dialogClass: "login-dialog",
                               position:    { my: "right top", at: "right bottom", of: $("#menubar") }, 
-                              open:        handle_dialog_open,
-                              close:       handle_dialog_close,
+                              open:        handle_login_dialog_open,
+                              close:       handle_login_dialog_close,
                               show:        {effect: "slide", direction: "up", delay: 50},
                               hide:        {effect: "slide", direction: "up", delay: 50},
                               buttons: [ 
-                                { text: "OK",     id:'login-dialog-ok',     click: handle_login_ok     },
+                                { text: "OK",     id:'login-dialog-ok',     click: handle_login_dialog_ok     },
                               ]
 } );
 
 $( "#userid-input" ).bind('input',watch_login_input);
 $( "#passwd-input" ).bind('input',watch_login_input);
 
-$( "#passwd-input" ).keypress( $('#userid-input'), handle_login_keypress );
-$( "#userid-input" ).keypress( $('#passwd-input'), handle_login_keypress );
+$( "#passwd-input" ).keypress( $('#userid-input'), handle_login_dialog_keypress );
+$( "#userid-input" ).keypress( $('#passwd-input'), handle_login_dialog_keypress );
 
-function handle_login_keypress( event ) {
-  if( event.which===$.ui.keyCode.ENTER ) {
-    if( ! $( "#login-dialog-ok" ).prop('disabled') ) {
-      $( '#login-dialog-ok' ).click();
-    }
-  }
-}
-
-function handle_dialog_open()
+function handle_login_dialog_open()
 {
   $(window).resize( function() {
     $("#login-dialog").dialog( "option","position", { my: "right top", at: "right bottom", of: $("#menubar") } );
@@ -41,7 +68,7 @@ function handle_dialog_open()
   $("#mb-login").unbind("click");
 }
 
-function handle_dialog_close()
+function handle_login_dialog_close()
 {
   $(window).unbind('resize');
   $(window).unbind('mouseup');
@@ -54,7 +81,15 @@ function handle_dialog_close()
   $( "#mb-login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
 }
 
-function handle_login_ok()
+function handle_login_dialog_keypress( event ) {
+  if( event.which===$.ui.keyCode.ENTER ) {
+    if( ! $( "#login-dialog-ok" ).prop('disabled') ) {
+      $( '#login-dialog-ok' ).click();
+    }
+  }
+}
+
+function handle_login_dialog_ok()
 {
   $userid   = $("#userid-input").val();
   $password = $("#passwd-input").val();
@@ -64,7 +99,7 @@ function handle_login_ok()
            timeout: 2000,
            data: {action: "verify_login", userid: $userid, password: $password },
            type: "POST",
-           success: function(result) { handle_verify_result(result); },
+           success: function(result) { handle_verify_login_result(result); },
            error: function(xhr,status) { 
              switch(status) {
                case 404: alert('File not found');          break;
@@ -76,29 +111,37 @@ function handle_login_ok()
          });
 }
 
-function handle_verify_result(x)
+function handle_verify_login_result(x)
 {
   if(x.state==0) {
     $("#login-error-msg").hide();
-    alert("Result Returned\n"+x.userid+"\n"+x.username);
-    clear_and_close_login();
-    $("#mb-username").text(x.username);
+    for (var key in x) {
+      if($.isPlainObject ( x[key] )) {
+        for (var kkey in x[key] ) {
+          $('body pre').before('<div class=result-x>'+key+'['+kkey+']: '+x[key][kkey]+'</div>');
+        }
+      } else {
+        $('body pre').before('<div class=result-x>'+key + ': ' + x[key]+'</div>');
+      }
+    }
+    close_login_dialog();
     handle_login(x.username);
   } else { // invalid userid
     $("#login-error-msg").text(x.error).show();
-    clear_password();
+    clear_login_password();
   }
 }
 
-function clear_password()
+function clear_login_password()
 {
   $("#passwd-input").val("");
   $( "#login-dialog-ok" ).prop('disabled',true).addClass('ui-state-disabled');
 }
 
-function clear_and_close_login()
+function close_login_dialog()
 {
-  clear_password();
+  $("#passwd-input").val("");
+  $( "#login-dialog-ok" ).prop('disabled',true).addClass('ui-state-disabled');
   $("#login-dialog").dialog("close");
 }
 
@@ -122,29 +165,3 @@ function watch_login_input()
   $( "#login-error-msg" ).hide();
 }
 
-
-function handle_login(username) {
-  userIsLoggedIn=1;
-  $( "#mb-username").text(username);
-  $( "#loginText" ).text("Logout");
-  $( "#mb-login" ).unbind('click');
-  $( "#mb-login" ).click( handle_logout );
-  $( "#loginArrow" ).removeClass('mb-down-arrow').removeClass('mb-up-arrow');
-}
-
-function handle_logout(username)
-{
-  $.ajax('index.php',
-         { cache: false,
-           dataType: "json",
-           data: {action: "logout" },
-           type: "POST"
-         });
-
-  userIsLoggedIn=0;
-  $( "#mb-username" ).text("Guest");
-  $( "#loginText" ).text("Login");
-  $( "#mb-login" ).unbind('click');
-  $( "#mb-login" ).click( function() { $( '#login-dialog' ).dialog("open"); } );
-  $( "#loginArrow" ).addClass('mb-down-arrow');
-}

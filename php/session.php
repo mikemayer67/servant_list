@@ -1,7 +1,8 @@
 <?php
 session_start();  
 
-include('php/database.php');
+include_once('php/database.php');
+include_once('php/coordinators.php');
 
 function is_logged_in()
 {
@@ -104,17 +105,6 @@ function verify_login()
       }
     }
 
-    $roles = array();
-    $res = $db->query("select a.list,a.description from lists a,coordinators b where a.list=b.list and b.userid='$userid'");
-    if($res)
-    {
-      while($row = $res->fetch_row())
-      {
-        $roles[$row[0]] = $row[1];
-      }
-      $res->close();
-    }
-
     $_SESSION['userid']   = $userid;
     $_SESSION['username'] = $name;
     $_SESSION['admin']    = $admin;
@@ -123,8 +113,13 @@ function verify_login()
     $rval = array( "state"=>0, 
                    "userid"=>$userid, 
                    "username"=>$name,
-                   "admin"=>$admin,
-                   "roles"=>$roles );
+                   "admin"=>$admin);
+
+    $roles = lookup_roles($userid);
+    if($roles) { 
+      $rval['roles'] = $roles; 
+    }
+
   }
   catch(Exception $e)
   {
